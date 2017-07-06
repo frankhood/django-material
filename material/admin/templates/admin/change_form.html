@@ -44,7 +44,7 @@
                 {% block after_related_objects %}{% endblock %}
             </div>
             <div class="card-action">
-                {% submit_row %}
+                {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
             </div>
         </div>
     </form>
