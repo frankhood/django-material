@@ -1,7 +1,7 @@
 <div class="row">
     {% if 'admin/img/icon-' in fieldset_field.contents %}
     <div class="checkbox-field col s12">
-        <input type="checkbox" id="test7" {% if 'icon-yes' in fieldset_field.contents %}checked="checked"  disabled="disabled" {% elif 'icon-no' in fieldset_field.contents %}disabled="disabled" {% elif 'icon-unknown' in fieldset_field.contents %}{% else %}disabled="disabled" {% endif %}/>
+        <input type="checkbox" id="test7" {% if 'icon-yes' in fieldset_field.contents %}checked="checked"  disabled="disabled" {% elif 'icon-no' in fieldset_field.contents %}disabled="disabled" {% elif 'icon-unknown' in fieldset_field.contents %}disabled="disabled" {% else %}disabled="disabled" {% endif %} class="disabled"/>
         <label for="test7">{{ fieldset_field.field.label|title }}</label>
     </div>
     {% else %}
