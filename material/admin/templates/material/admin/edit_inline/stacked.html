@@ -31,7 +31,7 @@
                                 <div class="row">
                                     {% if 'admin/img/icon-' in field.contents %}
                                         <div class="input-field col s12">
-                                            <input type="checkbox" id="test7" {% if 'icon-yes' in field.contents %}checked="checked"{% endif %} disabled="disabled" />
+                                            <input type="checkbox" id="test7" {% if 'icon-yes' in field.contents %}checked="checked"  disabled="disabled"{% elif 'icon-unknown' in field.contents %}{% else %}disabled="disabled" {% endif %} class="checkbox-disabled" />
                                             <label for="test7">{{ field.field.label|title }}</label>
                                         </div>
                                     {% else %}
