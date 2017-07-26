@@ -113,14 +113,18 @@
     {% endif %}
 </form>
 
+{% block object-tools %}
+<div class="fixed-action-btn">
+{% block object-tool-items %}
 {% if has_add_permission %}
 {% url cl.opts|admin_urlname:'add' as add_url %}
-<div class="fixed-action-btn">
     <a class="btn-floating btn-large waves-effect waves-light red z-depth-2" href="{% add_preserved_filters add_url is_popup to_field %}">
         <i class="large material-icons">add</i>
     </a>
-</div>
 {% endif %}
+{% endblock object-tool-items %}
+</div>
+{% endblock object-tools %}
 
 <form id="changelist-search" action="?" method="get">
     <input type="hidden" id="searchbar_hidden"/>
