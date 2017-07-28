@@ -49,6 +49,7 @@
         </div>
     </form>
 </div>
+{% block right-panel %}
 <div class="right-panel">
     {% if not is_popup and change %}
     <div class="z-depth-1">
@@ -73,6 +74,7 @@
     </div>
     {% endif %}
 </div>
+{% endblock right-panel %}
 
 {% if adminform and add %}
 <script type="text/javascript">

@@ -75,6 +75,9 @@
                     {% endfor %}
                 {% endblock sidenav_items %}
             </ul>
+            {% else %}
+                {% block sidenav_header_popup %}
+                {% endblock sidenav_header_popup %}
             {% endif %}
             {% endblock header %}
         </header>
@@ -91,6 +94,7 @@
                         </div>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
                             {% block userlinks %}
+                            {% if not is_popup %}
                             {% if user.is_active and user.is_staff %}
                                 {% url 'django-admindocs-docroot' as docsroot %}
                                 {% if docsroot %}
@@ -104,6 +108,7 @@
                             <li><a href="{% url 'admin:logout' %}" data-turbolinks="false"><i class="material-icons right">exit_to_app</i>{% trans "Log out" %}</a></li>
                             {% else %}
                             <li><a href="{% url 'admin:login' %}" data-turbolinks="false"><i class="material-icons right">lock_open</i>{% trans "Log in" %}</a></li>
+                            {% endif %}
                             {% endif %}
                             {% endblock %}
                         </ul>
