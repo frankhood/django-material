@@ -52,6 +52,17 @@
                         {% endif %}{% endfor %}{% endfor %}{% endfor %}
                         {% endpart %}
                     </div>
+					{# card-action always visible #}
+					<div class="card-action card-action-inline">
+                        <div class="right-align">
+							{% if element.inline.formset.can_delete %}
+                            <div style="display:none">{{ inline_admin_form.deletion_field.field }}</div>
+                            <button type="button" class="btn btn-flat white lighten-4"  data-formset-delete-button>{% trans 'Delete' %}</button>
+							{% endif %}                        
+						</div>
+                    </div>
+					{% comment %}
+					{# original code #}
                     {% if element.inline.formset.can_delete %}
                     <div class="card-action">
                         <div class="right-align">
@@ -60,6 +71,7 @@
                         </div>
                     </div>
                     {% endif %}
+					{% endcomment %}
                 </div>
             </div>
             {% if inline_admin_form.form.prefix ==  element.inline.formset.empty_form.prefix %}</script>{% endif %}
