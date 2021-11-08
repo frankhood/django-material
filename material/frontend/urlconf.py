@@ -1,13 +1,11 @@
-from __future__ import unicode_literals
-
+import six
 try:
     from urllib.parse import quote
 except:
     from urllib import quote
 
-from django.core.urlresolvers import RegexURLResolver, Resolver404
+from django.urls import URLResolver, Resolver404
 from django.http.request import QueryDict
-from django.utils import six
 
 
 class ModuleMatchName(str):
@@ -18,7 +16,7 @@ class ModuleMatchName(str):
     """
 
 
-class ModuleURLResolver(RegexURLResolver):
+class ModuleURLResolver(URLResolver):
     """Module URL Resolver.
 
     A wrapper around RegexURLResolver that check the module installed

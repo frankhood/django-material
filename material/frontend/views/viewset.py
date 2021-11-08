@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.conf.urls import url
 from django.contrib.auth import get_permission_codename
 
@@ -13,7 +11,7 @@ from .update import UpdateModelView
 DEFAULT = object()
 
 
-class BaseViewset(object):
+class BaseViewset:
     """Base router-like class for frontend viewset."""
 
     @property
@@ -38,7 +36,7 @@ class BaseViewset(object):
         for url_entry in url_entries:
             regexp, view, name = url_entry
             result.append(
-                url(regexp.format(**format_kwargs),
+                re_path(regexp.format(**format_kwargs),
                     view,
                     name=name.format(**format_kwargs))
             )
@@ -168,7 +166,7 @@ class ModelViewSet(BaseViewset):
         """
         opts = self.model._meta
         codename = get_permission_codename('add', opts)
-        return request.user.has_perm('{}.{}'.format(opts.app_label, codename))
+        return request.user.has_perm(f'{opts.app_label}.{codename}')
 
     """
     Detail
@@ -193,7 +191,7 @@ class ModelViewSet(BaseViewset):
         """
         opts = self.model._meta
         codename = get_permission_codename('view', opts)
-        view_perm = '{}.{}'.format(opts.app_label, codename)
+        view_perm = f'{opts.app_label}.{codename}'
         if request.user.has_perm(view_perm):
             return True
         elif request.user.has_perm(view_perm, obj=obj):
@@ -268,7 +266,7 @@ class ModelViewSet(BaseViewset):
         """
         opts = self.model._meta
         codename = get_permission_codename('change', opts)
-        change_perm = '{}.{}'.format(opts.app_label, codename)
+        change_perm = f'{opts.app_label}.{codename}'
         if request.user.has_perm(change_perm):
             return True
         return request.user.has_perm(change_perm, obj=obj)
@@ -298,7 +296,7 @@ class ModelViewSet(BaseViewset):
         """
         opts = self.model._meta
         codename = get_permission_codename('delete', opts)
-        delete_perm = '{}.{}'.format(opts.app_label, codename)
+        delete_perm = f'{opts.app_label}.{codename}'
         if request.user.has_perm(delete_perm):
             return True
         return request.user.has_perm(delete_perm, obj=obj)

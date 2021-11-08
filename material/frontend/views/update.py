@@ -1,7 +1,5 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth import get_permission_codename
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.views import generic
 from django.utils.translation import ugettext_lazy as _
 
@@ -25,7 +23,7 @@ class UpdateModelView(MessageUserMixin, ModelViewMixin, generic.UpdateView):
         opts = self.model._meta
         codename = get_permission_codename('change', opts)
         return request.user.has_perm(
-            '{}.{}'.format(opts.app_label, codename), obj=obj)
+            f'{opts.app_label}.{codename}', obj=obj)
 
     def get_success_url(self):
         """Redirect back to the detail view if no `success_url` is configured."""

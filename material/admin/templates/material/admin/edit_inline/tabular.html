@@ -1,4 +1,4 @@
-{% load i18n admin_urls admin_static admin_modify material_form material_form_internal %}
+{% load i18n admin_urls static admin_modify material_form material_form_internal %}
 <div class="row">
     <div class="formset-field col s12" data-formset-prefix="{{ element.inline.formset.prefix }}">
         {% part element.inline label %}<h5>{{ element.inline.opts.verbose_name_plural|capfirst }}</h5>{% endpart %}

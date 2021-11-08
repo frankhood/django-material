@@ -3,7 +3,7 @@
 import inspect
 import functools
 
-from django.utils import six
+import six
 from django.utils.html import conditional_escape
 
 
@@ -43,7 +43,7 @@ except ImportError:
 
     class SimpleNode(TagHelperNode):
         def __init__(self, func, takes_context, args, kwargs, target_var):
-            super(SimpleNode, self).__init__(func, takes_context, args, kwargs)
+            super().__init__(func, takes_context, args, kwargs)
             self.target_var = target_var
 
         def render(self, context):

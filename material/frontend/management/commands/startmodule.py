@@ -28,7 +28,7 @@ class Command(TemplateCommand):
     )
 
     def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)
         parser.set_defaults(extensions=['py', 'html'])
 
     def handle_template(self, template, subdir):
@@ -40,10 +40,10 @@ class Command(TemplateCommand):
         """
         if template is None:
             return path.join(material.__path__[0], 'conf', subdir)
-        return super(Command, self).handle_template(template, subdir)
+        return super().handle_template(template, subdir)
 
     def _validate_name(self, app_name):
-        super(Command, self).validate_name(app_name, "module")
+        super().validate_name(app_name, "module")
         try:
             import_module(app_name)
         except ImportError:
@@ -125,11 +125,11 @@ class Command(TemplateCommand):
                         "directory won't replace conflicting files".format(new_path))
 
                 if new_path.endswith(extensions) or filename in extra_files:
-                    with io.open(old_path, 'r', encoding='utf-8') as template_file:
+                    with open(old_path, 'r', encoding='utf-8') as template_file:
                         content = template_file.read()
                     template = Engine().from_string(content)
                     content = template.render(context)
-                    with io.open(new_path, 'w', encoding='utf-8') as new_file:
+                    with open(new_path, 'w', encoding='utf-8') as new_file:
                         new_file.write(content)
                 else:
                     shutil.copyfile(old_path, new_path)

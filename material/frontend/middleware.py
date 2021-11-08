@@ -1,5 +1,5 @@
 from django.http import QueryDict, HttpResponseRedirect
-
+from django.utils.deprecation import MiddlewareMixin
 try:
     from urllib.parse import urlencode, parse_qs, urlsplit, urlunsplit
 except ImportError:
@@ -7,7 +7,7 @@ except ImportError:
     from urllib import urlencode
 
 
-class SmoothNavigationMiddleware(object):
+class SmoothNavigationMiddleware(MiddlewareMixin):
     """Keep `?back=` queryset parameter on POST requests."""
 
     def process_response(self, request, response):  # noqa D102

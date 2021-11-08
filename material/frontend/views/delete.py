@@ -1,8 +1,6 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import router
 from django.db.models.deletion import Collector
 from django.http import Http404
@@ -28,7 +26,7 @@ class DeleteModelView(MessageUserMixin, generic.DeleteView):
         # default lookup for the django permission
         opts = self.model._meta
         codename = get_permission_codename('delete', opts)
-        delete_perm = '{}.{}'.format(opts.app_label, codename)
+        delete_perm = f'{opts.app_label}.{codename}'
         if request.user.has_perm(delete_perm):
             return True
         return request.user.has_perm(delete_perm, obj=obj)
@@ -44,7 +42,7 @@ class DeleteModelView(MessageUserMixin, generic.DeleteView):
         `{{ deleted_objects }}` - list of related objects to delete
         """
         kwargs.setdefault('deleted_objects', self._get_deleted_objects())
-        return super(DeleteModelView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_object(self):
         """Retrieve the object for delete.
@@ -60,7 +58,7 @@ class DeleteModelView(MessageUserMixin, generic.DeleteView):
             except (ValidationError, ValueError):
                 raise Http404
 
-        obj = super(DeleteModelView, self).get_object()
+        obj = super().get_object()
         if not self.has_object_permission(self.request, obj):
             raise PermissionDenied
         return obj
@@ -69,8 +67,8 @@ class DeleteModelView(MessageUserMixin, generic.DeleteView):
         """Redirect back to the list view if no `success_url` is configured."""
         if self.success_url is None:
             opts = self.model._meta
-            return reverse('{}:{}_list'.format(opts.app_label, opts.model_name))
-        return super(DeleteModelView, self).get_success_url()
+            return reverse(f'{opts.app_label}:{opts.model_name}_list')
+        return super().get_success_url()
 
     def get_template_names(self):
         """
@@ -84,14 +82,14 @@ class DeleteModelView(MessageUserMixin, generic.DeleteView):
         if self.template_name is None:
             opts = self.model._meta
             return [
-                '{}/{}{}.html'.format(opts.app_label, opts.model_name, self.template_name_suffix),
+                f'{opts.app_label}/{opts.model_name}{self.template_name_suffix}.html',
                 'material/frontend/views/confirm_delete.html',
             ]
 
         return [self.template_name]
 
     def delete(self, request, *args, **kwargs):
-        response = super(DeleteModelView, self).delete(request, *args, **kwargs)
+        response = super().delete(request, *args, **kwargs)
         self.message_user()
         return response
 

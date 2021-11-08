@@ -58,7 +58,7 @@ if 'test' not in sys.argv:
 LOGIN_REDIRECT_URL = '/integration/'
 
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -167,7 +167,7 @@ EMAIL_PORT = 587
 
 if os.environ.get('DEBUG_TOOLBAR'):
     INSTALLED_APPS += ('debug_toolbar',)
-    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware', )
+    MIDDLEWARE += ('debug_toolbar.middleware.DebugToolbarMiddleware', )
 
 try:
     from deploy.local_settings import *  # NOQA

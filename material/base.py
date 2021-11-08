@@ -5,11 +5,11 @@ import warnings
 from functools import partial
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template, select_template
-from django.utils import six
-from django.utils.encoding import smart_text
+import six
+from django.utils.encoding import smart_str
 
 
-class LayoutNode(object):
+class LayoutNode:
     """Base class for self-rendered nodes."""
 
     span_columns = 1
@@ -58,7 +58,7 @@ class LayoutNode(object):
 def _convert_to_field(elements):
     result = []
     for element in elements:
-        if isinstance(element, six.string_types):
+        if isinstance(element, str):
             result.append(Field(element))
         else:
             result.append(element)
@@ -87,7 +87,7 @@ def _get_field_template(template_pack, field):
         for widget_template in widget_templates
     ]
 
-    template_names = ["{}/fields/{}".format(template_pack, template_name)
+    template_names = [f"{template_pack}/fields/{template_name}"
                       for template_name in widget_templates + field_templates]
 
     return select_template(template_names)
@@ -165,7 +165,7 @@ class Column(LayoutNode):
         self.column_id = kwargs.pop('column_id', None)
 
 
-class Span(object):
+class Span:
     """Wrapper for a field reference.
 
     There are  ``Span2``, ``Span3``, .., ``Span12`` shortcut classes.
@@ -214,7 +214,7 @@ class Span(object):
             warnings.warn("Unknown field and widget {} {}".format(
                 bound_field.field.__class__,
                 bound_field.field.widget.__class__))
-            return smart_text(bound_field)
+            return smart_str(bound_field)
         else:
             hidden_initial = ''
 
@@ -231,7 +231,7 @@ class Span(object):
                 context.pop()
 
     def __str__(self):
-        return 'Span{}({})'.format(self.span_columns, self.field_name)
+        return f'Span{self.span_columns}({self.field_name})'
 
 
 Field = partial(Span, 1)
@@ -262,7 +262,7 @@ def _collect_elements(element_cls, parent, container=None):
     return container
 
 
-class LayoutMixin(object):
+class LayoutMixin:
     """Extracts from layout `fields` for django FormView.
 
     Shortcut allows don't specify ``fields`` parameter in the GenericView

@@ -5,13 +5,13 @@ import re
 from collections import OrderedDict
 
 from django.db.models.query import QuerySet
-from django.forms.forms import BoundField
+from django.forms.boundfield import BoundField
 from django.template import Library
 from django.template.base import (
     Node, TemplateSyntaxError, Variable, token_kwargs
 )
 from django.utils import formats
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from ..base import Field
 from ..widgets import SelectDateWidget
@@ -49,7 +49,7 @@ class FormRenderNode(Node):
 
             self.kwargs[key] = self.kwargs[key]
 
-        self.nodelist = parser.parse(('end{}'.format(bits[0]),))
+        self.nodelist = parser.parse((f'end{bits[0]}',))
         parser.delete_first_token()
 
         self.element = Variable(bits[1])
@@ -83,7 +83,7 @@ class FormRenderNode(Node):
                 return element.render(context, **options)
         else:
             raise TemplateSyntaxError(
-                "form_render can't render %r".format(element)
+                f"form_render can't render %r"
             )
 
 
@@ -141,7 +141,7 @@ def datepicker_value(value, date_format):
 @register.filter('force_text')
 def force_text_impl(value):
     """Coerce widget value to text."""
-    return force_text(value)
+    return force_str(value)
 
 
 @register.filter
@@ -160,15 +160,14 @@ def split_choices_by_columns(choices, columns):
 @register.filter
 def select_date_widget_wrapper(bound_field):
     """Wrap SelectDateWidget into django-material internal wrapper."""
-    class Wrapper(object):
+    class Wrapper:
         def __init__(self, bound_field):
             self.bound_field = bound_field
 
         @property
         def selects(self):
             widget = SelectDateWidget(self.bound_field.field.widget)
-            for data in widget.selects_data(self.bound_field.value()):
-                yield data
+            yield from widget.selects_data(self.bound_field.value())
 
     return Wrapper(bound_field)
 
@@ -200,7 +199,7 @@ def select_options(bound_field):
     selected = bound_field.value()
     if not isinstance(selected, (list, tuple, QuerySet)):
         selected = [selected]
-    selected = set(force_text(v) for v in selected)
+    selected = {force_str(v) for v in selected}
 
     groups = OrderedDict()
     for option in bound_field.field.widget.choices:
@@ -211,14 +210,14 @@ def select_options(bound_field):
             for value, label in option_label:
                 if value is None:
                     value = ''
-                value = force_text(value)
+                value = force_str(value)
                 groups[option_value].append((label, value, value in selected))
         else:
             if None not in groups:
                 groups[None] = []
             if option_value is None:
                 option_value = ''
-            value = force_text(option_value)
+            value = force_str(option_value)
             groups[None].append(
                 (option_label, option_value, value in selected)
             )

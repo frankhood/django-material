@@ -3,7 +3,7 @@ import re
 from collections import defaultdict
 
 from django.forms.utils import flatatt
-from django.forms.forms import BoundField
+from django.forms.boundfield import BoundField
 from django.template import Library
 from django.template.base import (
     TemplateSyntaxError, Node, Variable, token_kwargs)
@@ -63,7 +63,7 @@ class FormNode(Node):
 
             self.kwargs[key] = self.kwargs[key]
 
-        self.nodelist = parser.parse(('end{}'.format(bits[0])))
+        self.nodelist = parser.parse(f'end{bits[0]}')
         parser.delete_first_token()
 
     def render(self, context):  # noqa D102
@@ -162,14 +162,14 @@ class FormPartNode(Node):
         if len(bits) > 3:
             if bits[3] != 'asvar':
                 raise TemplateSyntaxError(
-                    'Forth argument should be asvar," " got {}'.format(bits[3])
+                    f'Forth argument should be asvar," " got {bits[3]}'
                 )
             if len(bits) < 4:
                 raise TemplateSyntaxError('Variable name not provided')
             else:
                 self.varname = Variable(bits[4])
 
-        self.nodelist = parser.parse(('end{}'.format(bits[0]),))
+        self.nodelist = parser.parse((f'end{bits[0]}',))
         parser.delete_first_token()
 
     def resolve_part(self, context):
@@ -247,7 +247,7 @@ class WidgetAttrsNode(Node):
         self.field = Variable(bits[1])
         self.group = Variable(bits[2])
         self.widget_attrs = Variable(bits[4]) if len(bits) >= 5 else None
-        self.nodelist = parser.parse(('end{}'.format(bits[0])))
+        self.nodelist = parser.parse(f'end{bits[0]}')
         parser.delete_first_token()
 
     def resolve_field(self, context):
@@ -334,7 +334,7 @@ class WidgetAttrNode(Node):
         self.group = Variable(bits[2])
         self.attr = bits[3]
         self.action = bits[4] if len(bits) >= 5 else 'override'
-        self.nodelist = parser.parse(('end{}'.format(bits[0])))
+        self.nodelist = parser.parse(f'end{bits[0]}')
         parser.delete_first_token()
 
     def resolve_field(self, context):
@@ -360,6 +360,6 @@ class WidgetAttrNode(Node):
             old_value, old_action = attrs[self.attr]
             if old_action != 'override':
                 attrs[self.attr] = (
-                    '{} {}'.format(old_value, value),
+                    f'{old_value} {value}',
                     self.action
                 )

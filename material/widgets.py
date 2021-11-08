@@ -1,7 +1,7 @@
 import datetime
-
+import six
 from django.conf import settings
-from django.utils import formats, six
+from django.utils import formats
 from django.forms.widgets import Widget
 from django.utils.encoding import force_str
 
@@ -31,7 +31,7 @@ class SelectDateWidget(Widget):
             year_val, month_val, day_val = value.year, value.month, value.day
         except AttributeError:
             year_val = month_val = day_val = None
-            if isinstance(value, six.string_types):
+            if isinstance(value, str):
                 if settings.USE_L10N:
                     try:
                         input_format = formats.get_format(
@@ -44,9 +44,9 @@ class SelectDateWidget(Widget):
                 else:
                     match = self.re_date.match(value)
                     if match:
-                        year_val, month_val, day_val = [
+                        year_val, month_val, day_val = (
                             int(v) for v in match.groups()
-                        ]
+                        )
 
         return year_val, month_val, day_val
 
@@ -81,7 +81,7 @@ class SelectDateWidget(Widget):
 
         month_choices = (
             self.none_choice(self.widget.month_none_value) +
-            list(six.iteritems(self.widget.months))
+            list(self.widget.months.items())
         )
 
         day_choices = (
