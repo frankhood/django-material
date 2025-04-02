@@ -1,10 +1,10 @@
 import warnings
 from importlib import import_module
+import six
 
 from django.apps import AppConfig, apps
 from django.urls import reverse
 from django.db.models.signals import post_migrate
-from django.utils.six.moves import input
 from django.template import Template, TemplateDoesNotExist
 from django.template.loader import get_template, select_template
 from django.utils.module_loading import module_has_submodule
@@ -178,7 +178,7 @@ def update_modules(app_config, verbosity=2, interactive=True, **kwargs):
 
     if stale_modules.exists():
         if interactive:
-            ok_to_delete = input(
+            ok_to_delete = six.moves.input(
                 "The following modules are stale and need to be deleted:\n {}\n"
                 "Are you sure you want to delete these modules entries?\n\n"
                 "Type 'yes' to continue, or 'no' to cancel: ".format(
