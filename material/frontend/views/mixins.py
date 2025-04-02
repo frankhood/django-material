@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms.models import modelform_factory
 from django.http import Http404
 from django.utils.html import format_html
@@ -17,7 +17,7 @@ def _collect_elements(parent, container=None):
     if container is None:
         container = []
 
-    if hasattr(parent, 'elements'):
+    if hasattr(parent, "elements"):
         for element in parent.elements:
             _collect_elements(element, container=container)
 
@@ -40,7 +40,7 @@ class ModelViewMixin(object):
             if self.layout is not None:
                 self.fields = _collect_elements(self.layout)
             else:
-                self.fields = '__all__'
+                self.fields = "__all__"
 
     def has_object_permission(self, request, obj):
         """Check object access permission.
@@ -56,7 +56,7 @@ class ModelViewMixin(object):
         `viewflow.get_queryset`
         """
         if self.queryset is None and self.viewset is not None:
-            if hasattr(self.viewset, 'get_queryset'):
+            if hasattr(self.viewset, "get_queryset"):
                 return self.viewset.get_queryset(self.request)
         return super(ModelViewMixin, self).get_queryset()
 
@@ -80,20 +80,20 @@ class ModelViewMixin(object):
         if self.form_class is None:
             if self.model is not None:
                 model = self.model
-            elif hasattr(self, 'object') and self.object is not None:
+            elif hasattr(self, "object") and self.object is not None:
                 model = self.object.__class__
             else:
                 model = self.get_queryset().model
-            return modelform_factory(model, fields=self.fields, widgets=self.form_widgets)
+            return modelform_factory(
+                model, fields=self.fields, widgets=self.form_widgets
+            )
         return super(ModelViewMixin, self).get_form_class()
 
     def get_success_url(self):
         """Redirect back to the list view if no `success_url` is configured."""
         if self.success_url is None:
             opts = self.model._meta
-            return reverse('{}:{}_list'.format(
-                opts.app_label, opts.model_name)
-            )
+            return reverse("{}:{}_list".format(opts.app_label, opts.model_name))
         return super(ModelViewMixin, self).get_success_url()
 
     def get_template_names(self):
@@ -109,14 +109,11 @@ class ModelViewMixin(object):
         if self.template_name is None:
             opts = self.model._meta
             return [
-                '{}/{}{}.html'.format(
-                    opts.app_label,
-                    opts.model_name,
-                    self.template_name_suffix),
-                '{}/{}_form.html'.format(
-                    opts.app_label,
-                    opts.model_name),
-                'material/frontend/views/form.html',
+                "{}/{}{}.html".format(
+                    opts.app_label, opts.model_name, self.template_name_suffix
+                ),
+                "{}/{}_form.html".format(opts.app_label, opts.model_name),
+                "material/frontend/views/form.html",
             ]
 
         return [self.template_name]
@@ -140,21 +137,26 @@ class MessageUserMixin(object):
         """Construct message and notify the user."""
         opts = self.model._meta
 
-        url = reverse('{}:{}_detail'.format(
-            opts.app_label, opts.model_name), args=[self.object.pk])
+        url = reverse(
+            "{}:{}_detail".format(opts.app_label, opts.model_name),
+            args=[self.object.pk],
+        )
         link = format_html('<a href="{}">{}</a>', quote(url), force_str(self.object))
         name = force_str(opts.verbose_name)
 
-        options = {
-            'link': link,
-            'name': name
-        }
+        options = {"link": link, "name": name}
         options.update(kwargs)
         message = format_html(_(message).format(**options))
-        messages.add_message(self.request, messages.SUCCESS, message, fail_silently=True)
+        messages.add_message(
+            self.request, messages.SUCCESS, message, fail_silently=True
+        )
 
     def success(self, message, fail_silently=True, **kwargs):
-        self.report(message, level=messages.SUCCESS, fail_silently=fail_silently, **kwargs)
+        self.report(
+            message, level=messages.SUCCESS, fail_silently=fail_silently, **kwargs
+        )
 
     def error(self, message, fail_silently=True, **kwargs):
-        self.report(message, level=messages.ERROR, fail_silently=fail_silently, **kwargs)
+        self.report(
+            message, level=messages.ERROR, fail_silently=fail_silently, **kwargs
+        )

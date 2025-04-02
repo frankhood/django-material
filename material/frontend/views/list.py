@@ -10,7 +10,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldDoesNotExist
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models.query import QuerySet
 from django.forms.forms import pretty_name
 from django.http import JsonResponse
@@ -140,31 +140,29 @@ class DataTableMixin(ContextMixin):
 
     datatable_config = None
     datatable_default_config = {
-        'processing': False,
-        'serverSide': True,
-        'ajax': {
-            'url': '.',
+        "processing": False,
+        "serverSide": True,
+        "ajax": {
+            "url": ".",
         },
-        'order': [],
-        'ordering': True,
-        'orderMulti': True,
-        'info': False,
-        'bFilter': False,
-        'bAutoWidth': True,
-        'bLengthChange': False,
-        'oLanguage': {
-            'oPaginate': {
-                'sFirst': "",
-                'sLast': "",
-                'sNext': "&rang;",
-                'sPrevious': "&lang;",
+        "order": [],
+        "ordering": True,
+        "orderMulti": True,
+        "info": False,
+        "bFilter": False,
+        "bAutoWidth": True,
+        "bLengthChange": False,
+        "oLanguage": {
+            "oPaginate": {
+                "sFirst": "",
+                "sLast": "",
+                "sNext": "&rang;",
+                "sPrevious": "&lang;",
             }
         },
-        'responsive': {
-            'details': False
-        }
+        "responsive": {"details": False},
     }
-    list_display = ('__str__', )
+    list_display = ("__str__",)
     empty_value_display = ""
     ordering = None
     viewset = None
@@ -177,11 +175,13 @@ class DataTableMixin(ContextMixin):
         first page render.
         """
         context = super(DataTableMixin, self).get_context_data(**kwargs)
-        context.update({
-            'datatable_config': json.dumps(self.get_datatable_config()),
-            'headers': self.get_headers_data(),
-            'data': self.get_table_data(0, self.paginate_by),
-        })
+        context.update(
+            {
+                "datatable_config": json.dumps(self.get_datatable_config()),
+                "headers": self.get_headers_data(),
+                "data": self.get_table_data(0, self.paginate_by),
+            }
+        )
 
         return context
 
@@ -192,9 +192,9 @@ class DataTableMixin(ContextMixin):
     def get_datatable_config(self):
         """Prepare datatable config."""
         config = self.datatable_default_config.copy()
-        config['pageLength'] = self.paginate_by
-        config['ajax']['url'] = self.request.path
-        config['columns'] = self.get_columns_def()
+        config["pageLength"] = self.paginate_by
+        config["ajax"]["url"] = self.request.path
+        config["columns"] = self.get_columns_def()
         if self.datatable_config is not None:
             config.update(self.datatable_config)
         return config
@@ -212,18 +212,24 @@ class DataTableMixin(ContextMixin):
             if attr_name == "__str__":
                 return ModelAttr(self.object_list.model, attr_name, opts.verbose_name)
             else:
-                data_sources = [self, self.viewset] if self.viewset is not None else [self]
+                data_sources = (
+                    [self, self.viewset] if self.viewset is not None else [self]
+                )
                 for data_source in data_sources:
                     if hasattr(data_source, attr_name):
                         return DataSourceAttr(data_source, attr_name)
             if hasattr(self.object_list.model, attr_name):
                 return ModelAttr(self.object_list.model, attr_name)
-        raise AttributeError("Unable to lookup '{}' on {}" .format(attr_name, self.object_list.model._meta.object_name))
+        raise AttributeError(
+            "Unable to lookup '{}' on {}".format(
+                attr_name, self.object_list.model._meta.object_name
+            )
+        )
 
     def get_columns_def(self):
         """Return columns definition for the datables js config."""
         return [
-            {'data': field_name, 'orderable': self.get_data_attr(field_name).orderable}
+            {"data": field_name, "orderable": self.get_data_attr(field_name).orderable}
             for field_name in self.get_list_display()
         ]
 
@@ -243,13 +249,13 @@ class DataTableMixin(ContextMixin):
         elif isinstance(value, six.integer_types + (decimal.Decimal, float)):
             return formats.number_format(value)
         elif isinstance(value, (list, tuple)):
-            return ', '.join(force_str(v) for v in value)
+            return ", ".join(force_str(v) for v in value)
         else:
             return force_str(value)
 
     def get_table_data(self, start, length):
         """Get a page for datatable."""
-        for item in self.object_list[start:start + length]:
+        for item in self.object_list[start : start + length]:
             columns = OrderedDict()
             for n, field_name in enumerate(self.get_list_display()):
                 attr = self.get_data_attr(field_name)
@@ -269,16 +275,16 @@ class DataTableMixin(ContextMixin):
         """Return the field or fields to use for ordering the queryset."""
         if self.request_form.is_valid():
             ordering = []
-            requested_order = self.request_form.cleaned_data['ordering']
+            requested_order = self.request_form.cleaned_data["ordering"]
             for spec in requested_order:
-                column_num, column_dir = spec.get('column', 0), spec.get('dir', 'asc')
+                column_num, column_dir = spec.get("column", 0), spec.get("dir", "asc")
 
                 try:
                     order = self.get_list_display()[int(column_num)]
-                    if column_dir == 'asc':
-                        order = '-' + order
+                    if column_dir == "asc":
+                        order = "-" + order
                 except (IndexError, TypeError):
-                    """ Skip """
+                    """Skip"""
                 else:
                     ordering.append(order)
             return ordering
@@ -293,11 +299,11 @@ class DataTableMixin(ContextMixin):
     def get_json_data(self, request, *args, **kwargs):
         """Return `JSONResponse` with data for datatable."""
         if not self.request_form.is_valid():
-            return JsonResponse({'error': self.request_form.errors})
+            return JsonResponse({"error": self.request_form.errors})
 
-        draw = self.request_form.cleaned_data['draw']
-        start = self.request_form.cleaned_data['start']
-        length = self.request_form.cleaned_data['length']
+        draw = self.request_form.cleaned_data["draw"]
+        start = self.request_form.cleaned_data["start"]
+        length = self.request_form.cleaned_data["length"]
 
         result = []
         for item, columns_data in self.get_table_data(start, length):
@@ -307,7 +313,7 @@ class DataTableMixin(ContextMixin):
             "draw": draw,
             "recordsTotal": self.total(),
             "recordsFiltered": self.total_filtered(),
-            "data": result
+            "data": result,
         }
 
         return JsonResponse(data)
@@ -318,13 +324,14 @@ class DataTableMixin(ContextMixin):
 
     def dispatch(self, request, *args, **kwargs):
         """Handle for browser HTTP and AJAX requests from datatables."""
-        self.request_form = forms.DatatableRequestForm(request.GET, prefix='datatable')
+        self.request_form = forms.DatatableRequestForm(request.GET, prefix="datatable")
         self.object_list = self.get_object_list()
-        if 'HTTP_DATATABLE' in request.META:
+        if "HTTP_DATATABLE" in request.META:
             handler = self.get_json_data
         elif request.method.lower() in self.http_method_names:
             handler = getattr(
-                self, request.method.lower(), self.http_method_not_allowed)
+                self, request.method.lower(), self.http_method_not_allowed
+            )
         else:
             handler = self.http_method_not_allowed
         return handler(request, *args, **kwargs)
@@ -355,7 +362,7 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
 
     model = None
     queryset = None
-    template_name_suffix = '_list'
+    template_name_suffix = "_list"
     list_display_links = ()
 
     def has_view_permission(self, request, obj=None):
@@ -368,8 +375,8 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
 
         # default lookup for the django permission
         opts = self.model._meta
-        codename = get_permission_codename('view', opts)
-        view_perm = '{}.{}'.format(opts.app_label, codename)
+        codename = get_permission_codename("view", opts)
+        view_perm = "{}.{}".format(opts.app_label, codename)
         if request.user.has_perm(view_perm):
             return True
         elif request.user.has_perm(view_perm, obj=obj):
@@ -386,8 +393,8 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
 
         # default lookup for the django permission
         opts = self.model._meta
-        codename = get_permission_codename('change', opts)
-        change_perm = '{}.{}'.format(opts.app_label, codename)
+        codename = get_permission_codename("change", opts)
+        change_perm = "{}.{}".format(opts.app_label, codename)
         if request.user.has_perm(change_perm):
             return True
         return request.user.has_perm(change_perm, obj=obj)
@@ -402,8 +409,8 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
 
         # default lookup for the django permission
         opts = self.model._meta
-        codename = get_permission_codename('add', opts)
-        return request.user.has_perm('{}.{}'.format(opts.app_label, codename))
+        codename = get_permission_codename("add", opts)
+        return request.user.has_perm("{}.{}".format(opts.app_label, codename))
 
     def get_template_names(self):
         """
@@ -417,11 +424,10 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
         if self.template_name is None:
             opts = self.object_list.model._meta
             return [
-                '{}/{}{}.html'.format(
-                    opts.app_label,
-                    opts.model_name,
-                    self.template_name_suffix),
-                'material/frontend/views/list.html',
+                "{}/{}{}.html".format(
+                    opts.app_label, opts.model_name, self.template_name_suffix
+                ),
+                "material/frontend/views/list.html",
             ]
         return [self.template_name]
 
@@ -430,9 +436,11 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
 
         If `self.list_display_links` is not set, the first column would be used.
         """
-        if (self.list_display_links or
-                self.list_display_links is None or
-                not list_display):
+        if (
+            self.list_display_links
+            or self.list_display_links is None
+            or not list_display
+        ):
             return self.list_display_links
         else:
             # Use only the first item in list_display as link
@@ -444,7 +452,7 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
             queryset = self.queryset
             if isinstance(queryset, QuerySet):
                 queryset = queryset.all()
-        elif self.viewset is not None and hasattr(self.viewset, 'get_queryset'):
+        elif self.viewset is not None and hasattr(self.viewset, "get_queryset"):
             queryset = self.viewset.get_queryset(self.request)
         elif self.model is not None:
             queryset = self.model._default_manager.all()
@@ -452,9 +460,8 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
             raise ImproperlyConfigured(
                 "%(cls)s is missing a QuerySet. Define "
                 "%(cls)s.model, %(cls)s.queryset, or override "
-                "%(cls)s.get_queryset()." % {
-                    'cls': self.__class__.__name__
-                })
+                "%(cls)s.get_queryset()." % {"cls": self.__class__.__name__}
+            )
         ordering = self.get_ordering()
         if ordering:
             if isinstance(ordering, six.string_types):
@@ -464,21 +471,25 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
 
     def format_column(self, item, field_name, value):
         if isinstance(value, bool):
-            return format_html('<i class="material-icons">{}</i>'.format(
-                'check' if value else 'close'
-            ))
+            return format_html(
+                '<i class="material-icons">{}</i>'.format("check" if value else "close")
+            )
         else:
-            formatted = super(ListModelView, self).format_column(item, field_name, value)
+            formatted = super(ListModelView, self).format_column(
+                item, field_name, value
+            )
             if field_name in self.get_list_display_links(self.get_list_display()):
-                formatted = format_html('<a href="{}">{}</a>', self.get_item_url(item), formatted)
+                formatted = format_html(
+                    '<a href="{}">{}</a>', self.get_item_url(item), formatted
+                )
             return formatted
 
     def get_item_url(self, item):
         """Link to object detail to `list_display_links` columns."""
         opts = self.model._meta
         return reverse(
-            '{}:{}_detail'.format(opts.app_label, opts.model_name),
-            args=[item.pk])
+            "{}:{}_detail".format(opts.app_label, opts.model_name), args=[item.pk]
+        )
 
     def get_context_data(self, **kwargs):
         """Additional context data for list view.
@@ -488,7 +499,9 @@ class ListModelView(TemplateResponseMixin, DataTableMixin, View):
         opts = self.model._meta
 
         if self.has_add_permission(self.request):
-            kwargs['add_url'] = reverse('{}:{}_add'.format(opts.app_label, opts.model_name))
+            kwargs["add_url"] = reverse(
+                "{}:{}_add".format(opts.app_label, opts.model_name)
+            )
 
         return super(ListModelView, self).get_context_data(**kwargs)
 

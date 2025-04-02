@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth import get_permission_codename
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models
 from django.http import Http404
@@ -43,8 +43,8 @@ class DetailModelView(generic.DetailView):
 
         # default lookup for the django permission
         opts = self.model._meta
-        codename = get_permission_codename('view', opts)
-        view_perm = '{}.{}'.format(opts.app_label, codename)
+        codename = get_permission_codename("view", opts)
+        view_perm = "{}.{}".format(opts.app_label, codename)
         if request.user.has_perm(view_perm):
             return True
         elif request.user.has_perm(view_perm, obj=obj):
@@ -63,8 +63,8 @@ class DetailModelView(generic.DetailView):
 
         # default lookup for the django permission
         opts = self.model._meta
-        codename = get_permission_codename('change', opts)
-        change_perm = '{}.{}'.format(opts.app_label, codename)
+        codename = get_permission_codename("change", opts)
+        change_perm = "{}.{}".format(opts.app_label, codename)
         if request.user.has_perm(change_perm):
             return True
         return request.user.has_perm(change_perm, obj=obj)
@@ -79,8 +79,8 @@ class DetailModelView(generic.DetailView):
 
         # default lookup for the django permission
         opts = self.model._meta
-        codename = get_permission_codename('delete', opts)
-        delete_perm = '{}.{}'.format(opts.app_label, codename)
+        codename = get_permission_codename("delete", opts)
+        delete_perm = "{}.{}".format(opts.app_label, codename)
         if request.user.has_perm(delete_perm):
             return True
         return request.user.has_perm(delete_perm, obj=obj)
@@ -113,15 +113,17 @@ class DetailModelView(generic.DetailView):
         """
         opts = self.model._meta
 
-        kwargs['object_data'] = self.get_object_data()
+        kwargs["object_data"] = self.get_object_data()
         if self.has_change_permission(self.request, self.object):
-            kwargs['change_url'] = reverse(
-                '{}:{}_change'.format(opts.app_label, opts.model_name),
-                args=[self.object.pk])
+            kwargs["change_url"] = reverse(
+                "{}:{}_change".format(opts.app_label, opts.model_name),
+                args=[self.object.pk],
+            )
         if self.has_delete_permission(self.request, self.object):
-            kwargs['delete_url'] = reverse(
-                '{}:{}_delete'.format(opts.app_label, opts.model_name),
-                args=[self.object.pk])
+            kwargs["delete_url"] = reverse(
+                "{}:{}_delete".format(opts.app_label, opts.model_name),
+                args=[self.object.pk],
+            )
 
         return super(DetailModelView, self).get_context_data(**kwargs)
 
@@ -137,11 +139,10 @@ class DetailModelView(generic.DetailView):
         if self.template_name is None:
             opts = self.model._meta
             return [
-                '{}/{}{}.html'.format(
-                    opts.app_label,
-                    opts.model_name,
-                    self.template_name_suffix),
-                'material/frontend/views/detail.html',
+                "{}/{}{}.html".format(
+                    opts.app_label, opts.model_name, self.template_name_suffix
+                ),
+                "material/frontend/views/detail.html",
             ]
 
         return [self.template_name]

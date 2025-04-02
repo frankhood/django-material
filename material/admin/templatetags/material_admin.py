@@ -5,7 +5,7 @@ from importlib import import_module
 from django.apps import apps
 from django.contrib.admin.views.main import PAGE_VAR
 from django.contrib.admin.utils import get_fields_from_path
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
 from django.conf import settings
 from django.db import models
 from django.utils import formats, six

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from ..frontend.apps import ModuleMixin
 from ..frontend.urlconf import ModuleURLResolver
@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 class MaterialAdminConfig(ModuleMixin, AppConfig):
     """Material Admin frontend module."""
 
-    name = 'material.admin'
+    name = "material.admin"
     label = "material_admin"
 
     icon = '<i class="material-icons">build</i>'
@@ -19,10 +19,12 @@ class MaterialAdminConfig(ModuleMixin, AppConfig):
 
     @property
     def urls(self):  # noqa D102
-        return ModuleURLResolver(r'^admin/', admin.site.urls[0], namespace='admin', module=self)
+        return ModuleURLResolver(
+            r"^admin/", admin.site.urls[0], namespace="admin", module=self
+        )
 
     def index_url(self):  # noqa D102
-        return reverse('admin:index'.format(self.label))
+        return reverse("admin:index".format(self.label))
 
     def has_perm(self, user):  # noqa D102
         return user.is_staff
