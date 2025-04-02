@@ -5,7 +5,7 @@ try:
 except:
     from urllib import quote
 
-from django.urls import RegexURLResolver, Resolver404
+from django.urls import resolve, Resolver404, ResolverMatch
 from django.http.request import QueryDict
 import six
 
@@ -18,25 +18,32 @@ class ModuleMatchName(str):
     """
 
 
-class ModuleURLResolver(RegexURLResolver):
+class ModuleURLResolver:
     """Module URL Resolver.
 
-    A wrapper around RegexURLResolver that check the module installed
-    state. And allows access to the resolved current module at runtime.
+    It was a wrapper around RegexURLResolver
+    that used to check the module installed
+    state, but RegexURLResolver is now deprecated
+    and this class was modified accordingly.
 
     Django reads url config once at the start. Installation and
     uninstallation the module at runtime don't produce change in the
     django url-conf.
 
-    Url access check happens at the resolve time.
+    Url access check happens at resolve time.
     """
 
     def __init__(self, *args, **kwargs):  # noqa D102
         self._module = kwargs.pop("module")
-        super(ModuleURLResolver, self).__init__(*args, **kwargs)
+        self.urlconf = kwargs.pop("urlconf", None)
 
-    def resolve(self, *args, **kwargs):  # noqa D102
-        result = super(ModuleURLResolver, self).resolve(*args, **kwargs)
+    def resolve(self, path):  # noqa D102
+
+        try:
+            result = resolve(path, urlconf=self.urlconf)
+
+        except Resolver404:
+            raise Resolver404({"message": "No matching URL pattern found."})
 
         if result and not getattr(self._module, "installed", True):
             raise Resolver404({"message": "Module not installed"})
