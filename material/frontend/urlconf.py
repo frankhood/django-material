@@ -7,7 +7,7 @@ except:
 
 from django.core.urlresolvers import RegexURLResolver, Resolver404
 from django.http.request import QueryDict
-from django.utils import six
+import six
 
 
 class ModuleMatchName(str):
@@ -32,14 +32,14 @@ class ModuleURLResolver(RegexURLResolver):
     """
 
     def __init__(self, *args, **kwargs):  # noqa D102
-        self._module = kwargs.pop('module')
+        self._module = kwargs.pop("module")
         super(ModuleURLResolver, self).__init__(*args, **kwargs)
 
     def resolve(self, *args, **kwargs):  # noqa D102
         result = super(ModuleURLResolver, self).resolve(*args, **kwargs)
 
-        if result and not getattr(self._module, 'installed', True):
-            raise Resolver404({'message': 'Module not installed'})
+        if result and not getattr(self._module, "installed", True):
+            raise Resolver404({"message": "Module not installed"})
 
         result.url_name = ModuleMatchName(result.url_name)
         result.url_name.module = self._module
@@ -63,10 +63,10 @@ def frontend_url(request, url=None, back_link=None, absolute=True):
     """
     params = QueryDict(mutable=True)
     for key, value in six.iterlists(request.GET):
-        if not key.startswith('datatable-') and key != '_':
+        if not key.startswith("datatable-") and key != "_":
             params.setlist(key, value)
 
-    if back_link == 'here_if_none' and 'back' in params:
+    if back_link == "here_if_none" and "back" in params:
         # Do nothing
         pass
     elif back_link is not None:
@@ -74,10 +74,10 @@ def frontend_url(request, url=None, back_link=None, absolute=True):
             back = "{}?{}".format(quote(request.path), quote(params.urlencode()))
         else:
             back = "{}".format(quote(request.path))
-        params['back'] = back
+        params["back"] = back
 
     if url is not None:
-        location = '{}?{}'.format(url, params.urlencode())
+        location = "{}?{}".format(url, params.urlencode())
         return request.build_absolute_uri(location) if absolute else location
     else:
         return params.urlencode()

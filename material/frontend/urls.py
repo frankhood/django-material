@@ -1,8 +1,9 @@
-from django.conf.urls import include, url
+from django.conf.urls import include
 from . import modules
+from django.urls import path
 
 
 urlpatterns = [
-    url(r'^accounts/', include('django.contrib.auth.urls')),
-    url(r'', include(modules.urls)),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('', include(modules.urls)),
 ]

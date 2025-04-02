@@ -1,8 +1,8 @@
-from django.conf.urls import url
 from django.views import generic
 from django.test.utils import override_settings
 from django_webtest import WebTest
 from .. import forms
+from django.urls import path
 
 
 @override_settings(ROOT_URLCONF=__name__)
@@ -40,6 +40,6 @@ class Test(WebTest):
 
 
 urlpatterns = [
-    url(r'^demo/registration/$', generic.FormView.as_view(
+    path('demo/registration/', generic.FormView.as_view(
         form_class=forms.RegistrationForm, success_url='/demo/registration/', template_name="demo.html")),
 ]

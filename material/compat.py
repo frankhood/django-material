@@ -3,15 +3,16 @@
 import inspect
 import functools
 
-from django.utils import six
+import six
 from django.utils.html import conditional_escape
 
 
-__all__ = ('simple_tag', )
+__all__ = ("simple_tag",)
 
 
 try:
     from django.template.library import Library  # NOQA
+
     simple_tag = Library.simple_tag
 except ImportError:
     # django 1.8
@@ -35,10 +36,7 @@ except ImportError:
             resolved_args = [var.resolve(context) for var in self.args]
             if self.takes_context:
                 resolved_args = [context] + resolved_args
-            resolved_kwargs = {
-                k: v.resolve(context)
-                for k, v in self.kwargs.items()
-            }
+            resolved_kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
             return resolved_args, resolved_kwargs
 
     class SimpleNode(TagHelperNode):
@@ -47,12 +45,11 @@ except ImportError:
             self.target_var = target_var
 
         def render(self, context):
-            resolved_args, resolved_kwargs = \
-                self.get_resolved_arguments(context)
+            resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
             output = self.func(*resolved_args, **resolved_kwargs)
             if self.target_var is not None:
                 context[self.target_var] = output
-                return ''
+                return ""
             if context.autoescape:
                 output = conditional_escape(output)
             return output
@@ -63,21 +60,25 @@ except ImportError:
 
         sig = inspect.signature(func)
         args = [
-            p.name for p in sig.parameters.values()
+            p.name
+            for p in sig.parameters.values()
             if p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
         ]
         varargs = [
-            p.name for p in sig.parameters.values()
+            p.name
+            for p in sig.parameters.values()
             if p.kind == inspect.Parameter.VAR_POSITIONAL
         ]
         varargs = varargs[0] if varargs else None
         varkw = [
-            p.name for p in sig.parameters.values()
+            p.name
+            for p in sig.parameters.values()
             if p.kind == inspect.Parameter.VAR_KEYWORD
         ]
         varkw = varkw[0] if varkw else None
         defaults = [
-            p.default for p in sig.parameters.values()
+            p.default
+            for p in sig.parameters.values()
             if p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
             if p.default is not p.empty
         ] or None
@@ -94,24 +95,30 @@ except ImportError:
 
         Backport from django 1.9
         """
+
         def dec(func):
             params, varargs, varkw, defaults = getargspec(func)
-            function_name = (
-                name or getattr(func, '_decorated_function', func).__name__
-            )
+            function_name = name or getattr(func, "_decorated_function", func).__name__
 
             @functools.wraps(func)
             def compile_func(parser, token):
                 bits = token.split_contents()[1:]
                 target_var = None
-                if len(bits) >= 2 and bits[-2] == 'as':
+                if len(bits) >= 2 and bits[-2] == "as":
                     target_var = bits[-1]
                     bits = bits[:-2]
                     args, kwargs = parse_bits(
-                        parser, bits, params, varargs, varkw,
-                        defaults, takes_context, function_name)
-                return SimpleNode(
-                    func, takes_context, args, kwargs, target_var)
+                        parser,
+                        bits,
+                        params,
+                        varargs,
+                        varkw,
+                        defaults,
+                        takes_context,
+                        function_name,
+                    )
+                return SimpleNode(func, takes_context, args, kwargs, target_var)
+
             library.tag(function_name, compile_func)
             return func
 
@@ -129,7 +136,7 @@ def context_flatten(context):
     result = {}
     # https://code.djangoproject.com/ticket/24765
     for dict_ in context.dicts:
-        if hasattr(dict_, 'flatten'):
+        if hasattr(dict_, "flatten"):
             dict_ = context_flatten(dict_)
         result.update(dict_)
     return result

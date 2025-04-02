@@ -16,13 +16,13 @@ from django.forms.forms import pretty_name
 from django.http import JsonResponse
 from django.utils import formats, six, timezone
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.views.generic import View
 from django.views.generic.base import ContextMixin, TemplateResponseMixin
 
 
 from .. import forms
+from django.utils.encoding import force_str
 
 
 def _get_attr_label(owner, attr_name):
@@ -243,9 +243,9 @@ class DataTableMixin(ContextMixin):
         elif isinstance(value, six.integer_types + (decimal.Decimal, float)):
             return formats.number_format(value)
         elif isinstance(value, (list, tuple)):
-            return ', '.join(force_text(v) for v in value)
+            return ', '.join(force_str(v) for v in value)
         else:
-            return force_text(value)
+            return force_str(value)
 
     def get_table_data(self, start, length):
         """Get a page for datatable."""

@@ -11,11 +11,11 @@ from django.template.base import (
     Node, TemplateSyntaxError, Variable, token_kwargs
 )
 from django.utils import formats
-from django.utils.encoding import force_text
 
 from ..base import Field
 from ..widgets import SelectDateWidget
 from .material_form import FormPartNode, WidgetAttrNode, _render_parts
+from django.utils.encoding import force_str
 
 
 register = Library()
@@ -141,7 +141,7 @@ def datepicker_value(value, date_format):
 @register.filter('force_text')
 def force_text_impl(value):
     """Coerce widget value to text."""
-    return force_text(value)
+    return force_str(value)
 
 
 @register.filter
@@ -200,7 +200,7 @@ def select_options(bound_field):
     selected = bound_field.value()
     if not isinstance(selected, (list, tuple, QuerySet)):
         selected = [selected]
-    selected = set(force_text(v) for v in selected)
+    selected = set(force_str(v) for v in selected)
 
     groups = OrderedDict()
     for option in bound_field.field.widget.choices:
@@ -211,14 +211,14 @@ def select_options(bound_field):
             for value, label in option_label:
                 if value is None:
                     value = ''
-                value = force_text(value)
+                value = force_str(value)
                 groups[option_value].append((label, value, value in selected))
         else:
             if None not in groups:
                 groups[None] = []
             if option_value is None:
                 option_value = ''
-            value = force_text(option_value)
+            value = force_str(option_value)
             groups[None].append(
                 (option_label, option_value, value in selected)
             )

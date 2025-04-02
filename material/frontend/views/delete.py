@@ -6,10 +6,10 @@ from django.core.urlresolvers import reverse
 from django.db import router
 from django.db.models.deletion import Collector
 from django.http import Http404
-from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 from .mixins import MessageUserMixin
+from django.utils.translation import gettext_lazy as _
 
 
 class DeleteModelView(MessageUserMixin, generic.DeleteView):

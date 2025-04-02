@@ -5,12 +5,12 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.urlresolvers import reverse
 from django.forms.models import modelform_factory
 from django.http import Http404
-from django.utils.encoding import force_text
 from django.utils.html import format_html
-from django.utils.http import urlquote
-from django.utils.translation import ugettext as _
 
 from ...base import Span
+from django.utils.translation import gettext as _
+from django.utils.encoding import force_str
+from urllib.parse import quote
 
 
 def _collect_elements(parent, container=None):
@@ -142,8 +142,8 @@ class MessageUserMixin(object):
 
         url = reverse('{}:{}_detail'.format(
             opts.app_label, opts.model_name), args=[self.object.pk])
-        link = format_html('<a href="{}">{}</a>', urlquote(url), force_text(self.object))
-        name = force_text(opts.verbose_name)
+        link = format_html('<a href="{}">{}</a>', quote(url), force_str(self.object))
+        name = force_str(opts.verbose_name)
 
         options = {
             'link': link,

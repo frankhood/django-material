@@ -1,8 +1,8 @@
-from django.conf.urls import url
 from django.views import generic
 from django.test.utils import override_settings
 from django_webtest import WebTest
 from .. import forms
+from django.urls import path
 
 
 @override_settings(ROOT_URLCONF=__name__)
@@ -34,6 +34,6 @@ class Test(WebTest):
         self.assertEquals('This field is required.', response.pyquery('#id_password_container .errors').text())
 
 urlpatterns = [
-    url(r'^demo/login/$', generic.FormView.as_view(
+    path('demo/login/', generic.FormView.as_view(
         form_class=forms.LoginForm, success_url='/demo/login/', template_name="demo.html")),
 ]
