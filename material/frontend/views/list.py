@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import json
+import six
 
 from collections import OrderedDict
 
@@ -14,7 +15,7 @@ from django.urls import reverse
 from django.db.models.query import QuerySet
 from django.forms.forms import pretty_name
 from django.http import JsonResponse
-from django.utils import formats, six, timezone
+from django.utils import formats, timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.views.generic import View
